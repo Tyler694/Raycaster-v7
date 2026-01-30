@@ -11,15 +11,15 @@ class Player:
 
     def draw(self):
         pygame.draw.circle(self.screen, (255,0,0), (self.x, self.y), 5)
-        pygame.draw.line(self.screen, (255,0,0), (self.x, self.y), (self.x + math.sin(self.angle) * 50, self.y + math.cos(self.angle) * 50))
+        pygame.draw.line(self.screen, (255,0,0), (self.x, self.y), (self.x + math.cos(self.angle) * 50, self.y + math.sin(self.angle) * 50))
     def move(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
-            self.x += math.sin(self.angle)
-            self.y += math.cos(self.angle)
+            self.x += math.cos(self.angle)
+            self.y += math.sin(self.angle)
         if keys[pygame.K_s]:
-            self.x += -math.sin(self.angle)
-            self.y += -math.cos(self.angle)
+            self.x += -math.cos(self.angle)
+            self.y += -math.sin(self.angle)
         if keys[pygame.K_a]:
             self.angle += 0.03
         if keys[pygame.K_d]:

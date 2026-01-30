@@ -22,43 +22,30 @@ def drawMap():
                 pygame.draw.rect(screen, (0,0,0), (j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE-1, TILE_SIZE-1))
 def get_tile(px, py):
     return px // 100, py // 100
-def findNextTile(tileX, tileY):
-    TILE_DISTX = ((tileX + 1) * 100) - player.x
 
-    n = 0
-    s = 0
-    e = 0
-    w = 0
-    while map[int(tileX + w)][int(tileY)] == 0:
-        w += 1
-        pygame.draw.circle(screen, (0, 255, 0), ((tileX + w) * 100, player.y), 5)
-    while map[int(tileX - e)][int(tileY)] == 0:
-        pygame.draw.circle(screen, (0, 255, 0), ((tileX - e) * 100, player.y), 5)
-        e += 1
-    while map[int(tileX)][int(tileY - s)] == 0:
-        pygame.draw.circle(screen, (0, 255, 0), (player.x, (tileY - s) * 100), 5)
-        s += 1
-    while map[int(tileX)][int(tileY + n)] == 0:
-        n += 1
-        pygame.draw.circle(screen, (0, 255, 0), (player.x, (tileY + n) * 100), 5)
+def findHorizontalLine(i):
+    pygame.draw.circle(screen, (255,0,0), (tileX * 100 + TILE_SIZE * i, player.y + ((math.tan((player.angle))) * ((tileX * 100 + TILE_SIZE * i) - player.x))), 5)
 
-    #print(TILE_DISTX * math.tan(player.angle * (180/math.pi)))
-
-    pygame.draw.circle(screen, (0,100,0), ((tileX + 1) * 100, player.y + (TILE_DISTX * math.tan((player.angle * 180 / math.pi) / 2))), 5)
-    pygame.draw.line(screen, (0,0,255), (player.x, player.y), ((tileX + 1) * 100, player.y))
+def rayCast():
+    for i in range(5):
+        findHorizontalLine(i + 1)
 
 while running:
     screen.fill((70,70,70))
-   #print((player.angle * 180 / math.pi) / 2)
 
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+    #Dist From First Vertical line
+    #((tileX * 100 + TILE_SIZE) - player.x)
+    #math.tan(360 - (player.angle * 180 / math.pi)) * ((tileX * 100 + TILE_SIZE) - player.x)
+
     drawMap()
     tileX, tileY = get_tile(player.x, player.y)
-    findNextTile(tileX, tileY)
+    print((math.tan((player.angle))) * ((tileX * 100 + TILE_SIZE) - player.x) * -1)
+    rayCast()
     player.draw()
     player.move()
 
