@@ -25,12 +25,16 @@ def get_tile(px, py):
 
 def findHorizontalLine(i):
     if player.angle > (3 * math.pi) / 2 or player.angle < math.pi / 2:
-        pygame.draw.circle(screen, (255,0,0), (tileX * 100 + TILE_SIZE * (i + 1), player.y + ((math.tan((player.angle))) * ((tileX * 100 + TILE_SIZE * (i + 1)) - player.x))), 5)
+        pygame.draw.circle(screen, (255,0,0), (tileX * 100 + TILE_SIZE * (i + 1), player.y + ((math.tan((player.angle)) * ((tileX * 100 + TILE_SIZE * (i + 1)) - player.x)))), 5)
     else:
         pygame.draw.circle(screen, (255, 0, 0), (tileX * 100 - TILE_SIZE * i, player.y + ((math.tan((player.angle))) * ((tileX * 100 - TILE_SIZE * i) - player.x))), 5)
+def findVerticalLine(i):
+    print(player.angle * 180 / math.pi)
+    pygame.draw.circle(screen, (255,0,0), (player.x - ((math.tan((player.angle - ((3 * math.pi) / 2))) * ((tileY * 100 - TILE_SIZE * i) - player.y))), tileY * 100 - TILE_SIZE * i), 5)
 def rayCast():
         for i in range(5):
             findHorizontalLine(i)
+            findVerticalLine(i)
 
 while running:
     screen.fill((70,70,70))
@@ -44,9 +48,11 @@ while running:
     #((tileX * 100 + TILE_SIZE) - player.x)
     #math.tan(360 - (player.angle * 180 / math.pi)) * ((tileX * 100 + TILE_SIZE) - player.x)
 
+    #Dist From First Horizontal Line
+    #(100 - ((tileY * 100 + TILE_SIZE) - player.y))
+
     drawMap()
     tileX, tileY = get_tile(player.x, player.y)
-    #print(player.angle, player.angle * 180 / math.pi)
     rayCast()
     player.draw()
     player.move()
