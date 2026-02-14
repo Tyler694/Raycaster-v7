@@ -32,30 +32,46 @@ def drawMap():
     for i, row in enumerate(map):
         for j, tile in enumerate(row):
             if tile == 1:
-                pygame.draw.rect(screen, (50, 50, 50), (j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE-1, TILE_SIZE-1))
+                pygame.draw.rect(screen, (50, 50, 50), (j * 15, i * 15, 15, 15))
             else:
-                pygame.draw.rect(screen, (0,0,0), (j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE-1, TILE_SIZE-1))
+                pygame.draw.rect(screen, (0,0,0), (j * 15, i * 15, 15, 15))
 
 def get_tile(px, py):
     return px // 100, py // 100
 
 def rayCast():
-    HITXV, HITYV = VerticalLines()
-    HITXH, HITYH = HorizontalLines()
+    for i in range(player.FOV):
+        ANGLE = (player.angle - (player.FOV / 2)) + (i * math.pi / 180)
+        ANGLE %= math.tau
 
-    HORIZONTAL_DIST = (math.sqrt((abs(player.x - HITXH))**2 + (abs(player.y - HITYH))**2))
-    VERTICAL_DIST = (math.sqrt((abs(player.x - HITXV))**2 + (abs(player.y - HITYV))**2))
+        HITXV, HITYV = VerticalLines(ANGLE)
+        HITXH, HITYH = HorizontalLines(ANGLE)
 
-    if HORIZONTAL_DIST > VERTICAL_DIST:
-        pygame.draw.line(screen, (255,0,0), (player.x, player.y), (HITXV, HITYV))
-    else:
-        pygame.draw.line(screen, (0,255,0), (player.x, player.y), (HITXH, HITYH))
+        HORIZONTAL_DIST = (math.sqrt((abs(player.x - HITXH))**2 + (abs(player.y - HITYH))**2))
+        VERTICAL_DIST = (math.sqrt((abs(player.x - HITXV))**2 + (abs(player.y - HITYV))**2))
 
+        if HORIZONTAL_DIST > VERTICAL_DIST:
+            VERTICAL_DIST = math.sqrt((VERTICAL_DIST**2) - (abs(player.y - HITYV))**2)
 
-def VerticalLines():
-    ANGLE = player.angle
+            #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXV, HITYV))
+            drawSlice(i, VERTICAL_DIST)
+        else:
+
+            HORIZONTAL_DIST = math.sqrt((HORIZONTAL_DIST**2)-(abs(player.x-HITXH))**2)
+
+            #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXH, HITYH))
+            drawSlice(i, HORIZONTAL_DIST)
+
+def drawSlice(index, dist):
+    SLICE_WIDTH = 10
+    Y_POSITION = 100 + (dist/5)
+    WALL_HEIGHT = 800 - (dist/5)
+    colour = 255-dist//2.9
+    print(dist)
+    pygame.draw.rect(screen, (colour,0,0), (SLICE_WIDTH * index,Y_POSITION,SLICE_WIDTH,WALL_HEIGHT))
+def VerticalLines(ANGLE):
     #RIGHT
-    if (ANGLE * 180 / math.pi) > 270 or (ANGLE * 180 / math.pi) < 90:
+    if (ANGLE * 180 / math.pi) >= 270 or (ANGLE * 180 / math.pi) <= 90:
 
         FIRST_HIT_X = (tileX * TILE_SIZE) + TILE_SIZE
         DISTANCE_X = abs(FIRST_HIT_X - player.x)
@@ -77,7 +93,7 @@ def VerticalLines():
         return NEXT_HIT_X, NEXT_HIT_Y
 
     #LEFT
-    if (ANGLE * 180 / math.pi) < 270 and (ANGLE * 180 / math.pi) > 90:
+    if (ANGLE * 180 / math.pi) <= 270 and (ANGLE * 180 / math.pi) >= 90:
         FIRST_HIT_X = (tileX * TILE_SIZE)
         DISTANCE_X = abs(player.x - FIRST_HIT_X)
 
@@ -98,8 +114,7 @@ def VerticalLines():
             i += 1
         return NEXT_HIT_X, NEXT_HIT_Y
 
-def HorizontalLines():
-    ANGLE = player.angle
+def HorizontalLines(ANGLE):
     #UP
     if (ANGLE * 180 / math.pi) <= 360 and (ANGLE * 180 / math.pi) >= 180:
         FIRST_HIT_Y = tileY * TILE_SIZE
@@ -122,7 +137,7 @@ def HorizontalLines():
         return NEXT_HIT_X, NEXT_HIT_Y
 
     #DOWN
-    if (ANGLE * 180 / math.pi) >= 0 or (ANGLE * 180 / math.pi) <= 180:
+    if (ANGLE * 180 / math.pi) >= 360 or (ANGLE * 180 / math.pi) <= 180:
         FIRST_HIT_Y = tileY * TILE_SIZE + TILE_SIZE
         DISTANCE_Y = abs(player.y - FIRST_HIT_Y)
 
@@ -151,11 +166,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    drawMap()
     tileX, tileY = get_tile(player.x, player.y)
     rayCast()
-    player.draw()
     player.move()
+
+    drawMap()
+    player.draw()
 
     pygame.display.flip()
     clock.tick(60)

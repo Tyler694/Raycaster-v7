@@ -8,9 +8,11 @@ class Player:
         self.y = 200
         self.angle = 0
         self.screen = pygame.display.get_surface()
+        self.FOV = 90
 
     def draw(self):
-        pygame.draw.circle(self.screen, (255,0,0), (self.x, self.y), 5)
+        pygame.draw.circle(self.screen, (0,255,0), (self.x*0.15, self.y*0.15), 3)
+        pygame.draw.line(self.screen,(0,255,0), (self.x*0.15,self.y*0.15), ((self.x*0.15)+math.cos(self.angle)*10,(self.y*0.15)+math.sin(self.angle)*10))
     def move(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
@@ -24,7 +26,4 @@ class Player:
         if keys[pygame.K_d]:
             self.angle -= 0.03
 
-        if self.angle < 0:
-            self.angle = math.tau
-        elif self.angle > math.tau:
-            self.angle = 0
+        self.angle %= math.tau
