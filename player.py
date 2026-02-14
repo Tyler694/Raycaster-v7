@@ -6,7 +6,7 @@ class Player:
     def __init__(self):
         self.x = 200
         self.y = 200
-        self.angle = 6.28
+        self.angle = 0
         self.screen = pygame.display.get_surface()
 
     def draw(self):

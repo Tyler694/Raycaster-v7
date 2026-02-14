@@ -12,6 +12,21 @@ pygame.display.set_caption("Raycaster V7 - TylerT")
 running = True
 player = Player()
 
+def CheckRange(num, min, max):
+    if num >= max:
+        return True
+    if num <= min:
+        return True
+
+def Clamp(num, min, max):
+    if num >= max:
+        num = max
+    if num <= min:
+        num = min
+    return num
+
+
+
 
 def drawMap():
     for i, row in enumerate(map):
@@ -24,137 +39,108 @@ def drawMap():
 def get_tile(px, py):
     return px // 100, py // 100
 
-def findHorizontalLine():
-
-        if player.angle > (3 * math.pi) / 2 or player.angle < math.pi / 2:
-            #East
-            i = 0
-            x = tileX * 100 + TILE_SIZE * i
-            y = player.y + (math.tan((player.angle)) * ((tileX * 100 + TILE_SIZE * i) - player.x))
-            if x >= 800:
-                x = 700
-            if y <= 0:
-                y = 100
-            if y >= 800:
-                y = 700
-
-            while map[int(x // 100)][int(y // 100)] == 0:
-                x = tileX * 100 + TILE_SIZE * (i+1)
-                y = player.y + (math.tan((player.angle)) * ((tileX * 100 + TILE_SIZE * (i+1)) - player.x))
-
-                if x >= 800:
-                    break
-                if x <= 0:
-                    break
-                if y <= 0:
-                    break
-                if y >= 800:
-                    break
-
-
-                pygame.draw.circle(screen, (255,0,0), (x, y), 5)
-                i+=1
-
-
-        else:
-            #West
-            i = 0
-
-            x = tileX * 100 - TILE_SIZE * i
-            y = player.y + (math.tan((player.angle))) * ((tileX * 100 - TILE_SIZE * i) - player.x)
-
-            if x <= 0:
-                x = 100
-            if y >= 800:
-                y = 700
-            if y <= 0:
-                y = 100
-
-            while map[int(x // 100)][int(y // 100)] == 0:
-
-                x = tileX * 100 - TILE_SIZE * i
-                y = player.y + (math.tan((player.angle))) * ((tileX * 100 - TILE_SIZE * i) - player.x)
-
-                if x <= 0:
-                    break
-                if y >= 800:
-                    break
-                if y <= 0:
-                    break
-                pygame.draw.circle(screen, (255,0,0), (x, y), 5)
-
-                i+=1
-        return x,y
-def findVerticalLine():
-        #North
-        if player.angle < 0 or player.angle > math.pi:
-            i = 0
-            x = player.x - (math.tan((player.angle - ((3 * math.pi) / 2))) * ((tileY * 100 - TILE_SIZE * i) - player.y))
-            y = tileY * 100 - TILE_SIZE * i
-            if x > 800:
-                x = 700
-            if x < 0:
-                x = 100
-            if y <= 0:
-                y = 100
-
-            while map[int(x // 100)][int(y // 100)] == 0:
-                x = player.x - (math.tan((player.angle - ((3 * math.pi) / 2))) * ((tileY * 100 - TILE_SIZE * i) - player.y))
-                y = tileY * 100 - (TILE_SIZE * i)
-
-                if x > 800:
-                    break
-                if x < 0:
-                    break
-                if y <= 0:
-                    break
-                pygame.draw.circle(screen, (255,0,0), (x, y), 5)
-
-                i += 1
-        else:
-                i = 0
-                #South
-                x = player.x - (math.tan((player.angle - ((3 * math.pi) / 2))) * ((tileY * 100 + TILE_SIZE * i) - player.y))
-                y = tileY * 100 + TILE_SIZE * i
-
-                if x >= 800:
-                    x = 700
-                if x <= 0:
-                    x = 100
-                if y <= 0:
-                    y = 100
-
-                while map[int(x//100)][int(y//100)+1] == 0:
-                    x = player.x - (math.tan((player.angle - ((3 * math.pi) / 2))) * ((tileY * 100 + TILE_SIZE * (i + 1)) - player.y))
-                    y = tileY * 100 + TILE_SIZE * (i + 1)
-                    if x >= 800:
-                        break
-                    if x <= 0:
-                        break
-                    if y <= 0:
-                        break
-
-                    pygame.draw.circle(screen, (255, 0, 0), (x, y), 5)
-                    i+=1
-        return x,y
 def rayCast():
-    HITXH,HITYH = findHorizontalLine()
-    HITXV,HITYV = findVerticalLine()
+    HITXV, HITYV = VerticalLines()
+    HITXH, HITYH = HorizontalLines()
 
+    HORIZONTAL_DIST = (math.sqrt((abs(player.x - HITXH))**2 + (abs(player.y - HITYH))**2))
+    VERTICAL_DIST = (math.sqrt((abs(player.x - HITXV))**2 + (abs(player.y - HITYV))**2))
 
-    HorizontalDist = math.sqrt((abs(HITXH - player.x)*abs(HITXH - player.x)) + (abs(HITYH - player.y)*abs(HITXH - player.x)))
-    VerticalDist = math.sqrt((abs(HITXV - player.x)*abs(HITXV - player.x)) + (abs(HITYV - player.y)*abs(HITXV - player.x)))
-
-    #print("Vertical",VerticalDist, "Horizontal", HorizontalDist)
-
-    if VerticalDist > HorizontalDist:
-        #Horizontal LEFT RIGHT
-        pygame.draw.line(screen, (255,0,0), (player.x, player.y), (HITXH, HITYH))
+    if HORIZONTAL_DIST > VERTICAL_DIST:
+        pygame.draw.line(screen, (255,0,0), (player.x, player.y), (HITXV, HITYV))
     else:
-        #Vertical TOP BOTTOM
-        pygame.draw.line(screen, (0,255,0), (player.x, player.y), (HITXV, HITYV))
+        pygame.draw.line(screen, (0,255,0), (player.x, player.y), (HITXH, HITYH))
 
 
+def VerticalLines():
+    ANGLE = player.angle
+    #RIGHT
+    if (ANGLE * 180 / math.pi) > 270 or (ANGLE * 180 / math.pi) < 90:
+
+        FIRST_HIT_X = (tileX * TILE_SIZE) + TILE_SIZE
+        DISTANCE_X = abs(FIRST_HIT_X - player.x)
+
+        FIRST_HIT_Y = (math.tan(ANGLE) * DISTANCE_X) + player.y
+
+        NEXT_HIT_X = Clamp(FIRST_HIT_X, 0, 700)
+        NEXT_HIT_Y = Clamp(FIRST_HIT_Y, 0, 700)
+
+        i = 0
+        while map[int(NEXT_HIT_X // 100)][int(NEXT_HIT_Y // 100)] == 0:
+            NEXT_HIT_X = FIRST_HIT_X + (TILE_SIZE * i)
+            NEXT_HIT_Y = FIRST_HIT_Y + (math.tan(ANGLE) * (TILE_SIZE * i))
+
+            if CheckRange(NEXT_HIT_X, 0, 700): break
+            if CheckRange(NEXT_HIT_Y, 0, 700): break
+
+            i += 1
+        return NEXT_HIT_X, NEXT_HIT_Y
+
+    #LEFT
+    if (ANGLE * 180 / math.pi) < 270 and (ANGLE * 180 / math.pi) > 90:
+        FIRST_HIT_X = (tileX * TILE_SIZE)
+        DISTANCE_X = abs(player.x - FIRST_HIT_X)
+
+        FIRST_HIT_Y = player.y - (math.tan(ANGLE) * DISTANCE_X)
+
+        NEXT_HIT_X = Clamp(FIRST_HIT_X, 0, 700)
+        NEXT_HIT_Y = Clamp(FIRST_HIT_Y, 0, 700)
+
+        i = 0
+        while map[int(NEXT_HIT_X // 100)-1][int(NEXT_HIT_Y // 100)] == 0:
+
+            NEXT_HIT_X = FIRST_HIT_X - (TILE_SIZE * i)
+            NEXT_HIT_Y = FIRST_HIT_Y - (math.tan(ANGLE) * (TILE_SIZE * i))
+
+            if CheckRange(NEXT_HIT_X, 0, 700): break
+            if CheckRange(NEXT_HIT_Y, 0, 700): break
+
+            i += 1
+        return NEXT_HIT_X, NEXT_HIT_Y
+
+def HorizontalLines():
+    ANGLE = player.angle
+    #UP
+    if (ANGLE * 180 / math.pi) <= 360 and (ANGLE * 180 / math.pi) >= 180:
+        FIRST_HIT_Y = tileY * TILE_SIZE
+        DISTANCE_Y = abs(player.y - FIRST_HIT_Y)
+
+        FIRST_HIT_X = (math.tan(ANGLE - ((3 * math.pi) / 2)) * DISTANCE_Y) + player.x
+
+        NEXT_HIT_X = Clamp(FIRST_HIT_X, 0, 700)
+        NEXT_HIT_Y = Clamp(FIRST_HIT_Y, 0, 700)
+
+        i = 0
+        while map[int(NEXT_HIT_X // 100)][int(NEXT_HIT_Y // 100)-1] == 0:
+            NEXT_HIT_Y = FIRST_HIT_Y - (TILE_SIZE * i)
+            NEXT_HIT_X = FIRST_HIT_X + (math.tan(ANGLE - ((3 * math.pi) / 2)) * (TILE_SIZE * i))
+
+            if CheckRange(NEXT_HIT_X, 0, 700): break
+            if CheckRange(NEXT_HIT_Y, 0, 700): break
+
+            i += 1
+        return NEXT_HIT_X, NEXT_HIT_Y
+
+    #DOWN
+    if (ANGLE * 180 / math.pi) >= 0 or (ANGLE * 180 / math.pi) <= 180:
+        FIRST_HIT_Y = tileY * TILE_SIZE + TILE_SIZE
+        DISTANCE_Y = abs(player.y - FIRST_HIT_Y)
+
+        FIRST_HIT_X = player.x - (math.tan(ANGLE - ((3 * math.pi) / 2)) * DISTANCE_Y)
+
+        NEXT_HIT_X = Clamp(FIRST_HIT_X, 0, 700)
+        NEXT_HIT_Y = Clamp(FIRST_HIT_Y, 0, 700)
+
+        i = 0
+        while map[int(NEXT_HIT_X // 100)][int(NEXT_HIT_Y // 100)] == 0:
+            NEXT_HIT_Y = FIRST_HIT_Y + (TILE_SIZE * i)
+            NEXT_HIT_X = FIRST_HIT_X - (math.tan(ANGLE - ((3 * math.pi) / 2)) * (TILE_SIZE * i))
+
+            if CheckRange(NEXT_HIT_X, 0, 700): break
+            if CheckRange(NEXT_HIT_Y, 0, 700): break
+
+            i += 1
+        return NEXT_HIT_X, NEXT_HIT_Y
 
 
 while running:
@@ -164,13 +150,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-    #Dist From First Vertical line
-    #((tileX * 100 + TILE_SIZE) - player.x)
-    #math.tan(360 - (player.angle * 180 / math.pi)) * ((tileX * 100 + TILE_SIZE) - player.x)
-
-    #Dist From First Horizontal Line
-    #(100 - ((tileY * 100 + TILE_SIZE) - player.y))
 
     drawMap()
     tileX, tileY = get_tile(player.x, player.y)
