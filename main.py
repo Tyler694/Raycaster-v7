@@ -4,7 +4,7 @@ import pygame
 from settings import *
 from player import *
 #setup
-screen = pygame.display.set_mode((800, 800))
+screen = pygame.display.set_mode((1600, 900))
 clock = pygame.time.Clock()
 
 pygame.display.set_caption("Raycaster V7 - TylerT")
@@ -54,32 +54,32 @@ def rayCast():
         #VERTICAL_DIST = abs(player.x - HITXV)
 
         if HORIZONTAL_DIST > VERTICAL_DIST:
-            #VERTICAL_DIST = math.sqrt((VERTICAL_DIST**2) - (abs(player.y - HITYV))**2)
+            VERTICAL_DIST *= math.cos(abs(ANGLE-player.angle))
 
             #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXV, HITYV))
             drawSlice(i, VERTICAL_DIST, "Vertical")
         else:
-            #HORIZONTAL_DIST = math.sqrt((HORIZONTAL_DIST**2)-(abs(player.x-HITXH))**2)
+            HORIZONTAL_DIST *= math.cos(abs(ANGLE-player.angle))
 
             #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXH, HITYH))
             drawSlice(i, HORIZONTAL_DIST,"Horizontal")
 
 def drawSlice(index, dist, side):
-    SLICE_WIDTH = 10
+    SLICE_WIDTH = 20
     X_POSITION = index * SLICE_WIDTH
 
-    SLICE_HEIGHT = 600 - (dist / 4)
-    Y_POSITION = math.floor(600 - SLICE_HEIGHT / 2)
+    SLICE_HEIGHT = 500 - (dist / 4)
+    Y_POSITION = math.floor(400 - SLICE_HEIGHT / 2)
 
-    shade = dist/2.5
-    print(SLICE_HEIGHT)
+    shade = abs(dist/4)
+    print(shade)
 
     colour = (0,0,0)
 
     if side == "Vertical":
-        colour = (255-shade,0,0)
+        colour = (shade,0,0)
     else:
-        colour = (0,0,255-shade)
+        colour = (0,0,shade)
 
     pygame.draw.rect(screen, colour,(X_POSITION,Y_POSITION,SLICE_WIDTH,SLICE_HEIGHT))
 def VerticalLines(ANGLE):
@@ -172,7 +172,7 @@ def HorizontalLines(ANGLE):
 
 
 while running:
-    screen.fill((70,70,70))
+    screen.fill((40,40,40))
 
 
     for event in pygame.event.get():
