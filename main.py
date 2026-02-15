@@ -40,35 +40,48 @@ def get_tile(px, py):
     return px // 100, py // 100
 
 def rayCast():
-    for i in range(player.FOV):
+    for i in range(90):
         ANGLE = (player.angle - (player.FOV / 2)) + (i * math.pi / 180)
         ANGLE %= math.tau
 
         HITXV, HITYV = VerticalLines(ANGLE)
         HITXH, HITYH = HorizontalLines(ANGLE)
 
-        HORIZONTAL_DIST = (math.sqrt((abs(player.x - HITXH))**2 + (abs(player.y - HITYH))**2))
-        VERTICAL_DIST = (math.sqrt((abs(player.x - HITXV))**2 + (abs(player.y - HITYV))**2))
+        HORIZONTAL_DIST = (math.sqrt((player.x - HITXH)**2 + (player.y - HITYH)**2))
+        VERTICAL_DIST = (math.sqrt((player.x - HITXV)**2 + (player.y - HITYV)**2))
+
+        #HORIZONTAL_DIST = abs(player.y - HITYH)
+        #VERTICAL_DIST = abs(player.x - HITXV)
 
         if HORIZONTAL_DIST > VERTICAL_DIST:
-            VERTICAL_DIST = math.sqrt((VERTICAL_DIST**2) - (abs(player.y - HITYV))**2)
+            #VERTICAL_DIST = math.sqrt((VERTICAL_DIST**2) - (abs(player.y - HITYV))**2)
 
             #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXV, HITYV))
-            drawSlice(i, VERTICAL_DIST)
+            drawSlice(i, VERTICAL_DIST, "Vertical")
         else:
-
-            HORIZONTAL_DIST = math.sqrt((HORIZONTAL_DIST**2)-(abs(player.x-HITXH))**2)
+            #HORIZONTAL_DIST = math.sqrt((HORIZONTAL_DIST**2)-(abs(player.x-HITXH))**2)
 
             #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXH, HITYH))
-            drawSlice(i, HORIZONTAL_DIST)
+            drawSlice(i, HORIZONTAL_DIST,"Horizontal")
 
-def drawSlice(index, dist):
+def drawSlice(index, dist, side):
     SLICE_WIDTH = 10
-    Y_POSITION = 100 + (dist/5)
-    WALL_HEIGHT = 800 - (dist/5)
-    colour = 255-dist//2.9
-    print(dist)
-    pygame.draw.rect(screen, (colour,0,0), (SLICE_WIDTH * index,Y_POSITION,SLICE_WIDTH,WALL_HEIGHT))
+    X_POSITION = index * SLICE_WIDTH
+
+    SLICE_HEIGHT = 600 - (dist / 4)
+    Y_POSITION = math.floor(600 - SLICE_HEIGHT / 2)
+
+    shade = dist/2.5
+    print(SLICE_HEIGHT)
+
+    colour = (0,0,0)
+
+    if side == "Vertical":
+        colour = (255-shade,0,0)
+    else:
+        colour = (0,0,255-shade)
+
+    pygame.draw.rect(screen, colour,(X_POSITION,Y_POSITION,SLICE_WIDTH,SLICE_HEIGHT))
 def VerticalLines(ANGLE):
     #RIGHT
     if (ANGLE * 180 / math.pi) >= 270 or (ANGLE * 180 / math.pi) <= 90:
