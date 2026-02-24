@@ -54,12 +54,12 @@ def rayCast():
         #VERTICAL_DIST = abs(player.x - HITXV)
 
         if HORIZONTAL_DIST > VERTICAL_DIST:
-            VERTICAL_DIST *= math.cos(abs(ANGLE-player.angle))
+            VERTICAL_DIST *= math.cos(ANGLE-player.angle)
 
             #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXV, HITYV))
             drawSlice(i, VERTICAL_DIST, "Vertical")
         else:
-            HORIZONTAL_DIST *= math.cos(abs(ANGLE-player.angle))
+            HORIZONTAL_DIST *= math.cos(ANGLE-player.angle)
 
             #pygame.draw.line(screen, (255,255,0), (player.x, player.y), (HITXH, HITYH))
             drawSlice(i, HORIZONTAL_DIST,"Horizontal")
@@ -187,4 +187,4 @@ while running:
     player.draw()
 
     pygame.display.flip()
-    clock.tick(60)
+    #clock.tick(165)
