@@ -4,7 +4,7 @@ import pygame
 from settings import *
 from player import *
 #setup
-screen = pygame.display.set_mode((1600, 900))
+screen = pygame.display.set_mode((800, 800))
 clock = pygame.time.Clock()
 
 pygame.display.set_caption("Raycaster V7 - TylerT")

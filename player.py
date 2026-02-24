@@ -26,4 +26,5 @@ class Player:
         if keys[pygame.K_d]:
             self.angle -= 0.03
 
+
         self.angle %= math.tau
