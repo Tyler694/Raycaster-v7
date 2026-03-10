@@ -4,7 +4,7 @@ import pygame
 from settings import *
 from player import *
 #setup
-screen = pygame.display.set_mode((800, 800))
+screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
 pygame.display.set_caption("Raycaster V7 - TylerT")
@@ -72,7 +72,6 @@ def drawSlice(index, dist, side):
     Y_POSITION = math.floor(400 - SLICE_HEIGHT / 2)
 
     shade = abs(dist/4)
-    print(shade)
 
     colour = (0,0,0)
 
